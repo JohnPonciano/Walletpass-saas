@@ -1,5 +1,4 @@
 "use client"
-
 import { useState } from "react"
 import { Github, Mail } from "lucide-react"
 import { signIn } from "next-auth/react"
@@ -33,7 +32,7 @@ export default function AuthCard() {
     if (result?.error) {
       alert("Erro no login: " + result.error)
     } else {
-      redirect("/")  
+      redirect("/dashboard")  
       }
     setIsLoading(false)
   }
@@ -92,6 +91,14 @@ export default function AuthCard() {
                   {isLoading && <Mail className="mr-2 h-4 w-4 animate-spin" />}
                   Sign In
                 </Button>
+                <Separator className="w-full" />
+                <div className="relative flex justify-center text-xs uppercase">
+                    <span className="bg-background px-2 text-muted-foreground">Or continue with</span>
+                </div>
+                <Button variant="outline" type="button" disabled={isLoading}>
+                  {isLoading ? <Mail className="mr-2 h-4 w-4 animate-spin" /> : <Github className="mr-2 h-4 w-4" />}{" "}
+                  Github
+                </Button>
               </div>
             </form>
           </TabsContent>
@@ -105,7 +112,7 @@ export default function AuthCard() {
             <form onSubmit={handleRegister}>
               <div className="grid gap-4">
                 <div className="grid gap-2">
-                  <Label htmlFor="name">Full Name</Label>
+                  <Label htmlFor="name">Team Name</Label>
                   <Input id="name" type="text" value={formData.name} onChange={handleChange} disabled={isLoading} />
                 </div>
                 <div className="grid gap-2">
@@ -121,6 +128,10 @@ export default function AuthCard() {
                   Create Account
                 </Button>
                 <Separator/>
+                <Button variant="outline" type="button" disabled={isLoading}>
+                  {isLoading ? <Mail className="mr-2 h-4 w-4 animate-spin" /> : <Github className="mr-2 h-4 w-4" />}{" "}
+                  Github
+                </Button>
               </div>
               
             </form>

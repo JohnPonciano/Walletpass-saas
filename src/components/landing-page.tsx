@@ -79,7 +79,7 @@ export default function HomePage() {
 
         {/* Footer */}
         <footer className="text-center py-8 text-zinc-500 text-sm">
-          © {new Date().getFullYear()} WalletPass. All rights reserved.
+          © {new Date().getFullYear()} XUnseen. All rights reserved.
         </footer>
       </div>
     </div>

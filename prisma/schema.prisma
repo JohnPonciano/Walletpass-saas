@@ -7,16 +7,32 @@ datasource db {
   url      = "file:./dev.db"
 }
 
+model Role {
+  id        String   @id @default(uuid())
+  name      String   @unique // Nome da role, ex: "admin", "user", "manager"
+  users     UserRole[] // Relacionamento com usuários
+}
+
+model UserRole {
+  userId  String
+  roleId  String
+  user    User   @relation(fields: [userId], references: [id])
+  role    Role   @relation(fields: [roleId], references: [id])
+
+  @@id([userId, roleId]) // Chave composta para garantir que um usuário tenha uma única role por vez
+}
+
 model User {
-  id            String   @id @default(uuid())
-  email         String   @unique
+  id            String    @id @default(uuid())
+  email         String    @unique
   password      String?
-  createdAt     DateTime @default(now())
+  createdAt     DateTime  @default(now())
   emailVerified DateTime?
   image         String?
   accounts      Account[]
   sessions      Session[]
-  groups        UserGroup[]
+  groups        UserGroup[] // Relacionamento com grupos de usuários
+  roles         UserRole[]  // Relacionamento com roles do usuário
 }
 
 model Account {
@@ -34,7 +50,7 @@ model Account {
   session_state     String?
   user              User    @relation(fields: [userId], references: [id], onDelete: Cascade)
 
-  @@unique([provider, providerAccountId])
+  @@unique([provider, providerAccountId]) // Garantindo que cada combinação provider+providerAccountId seja única
 }
 
 model Session {
@@ -48,7 +64,8 @@ model Session {
 model Group {
   id        String    @id @default(uuid())
   name      String    @unique
-  users     UserGroup[]
+  users     UserGroup[] // Relacionamento com usuários que pertencem ao grupo
+  passwords Password[]  // Relacionamento com senhas do grupo
 }
 
 model UserGroup {
@@ -56,5 +73,32 @@ model UserGroup {
   groupId String
   user    User   @relation(fields: [userId], references: [id])
   group   Group  @relation(fields: [groupId], references: [id])
+  passwordAccess  PasswordAccess[] // Correto
+
   @@id([userId, groupId])
+}
+
+
+model Password {
+  id        String   @id @default(uuid())
+  groupId   String
+  name      String
+  value     String
+  group     Group    @relation(fields: [groupId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  passwordAccess PasswordAccess[] // Correto
+}
+
+model PasswordAccess {
+  id          String   @id @default(uuid())
+  passwordId  String
+  password    Password @relation(fields: [passwordId], references: [id])
+  
+  // Referência para a chave composta do UserGroup
+  userGroupUserId  String
+  userGroupGroupId String
+  userGroup   UserGroup @relation(fields: [userGroupUserId, userGroupGroupId], references: [userId, groupId])
+
+  @@unique([passwordId, userGroupUserId, userGroupGroupId]) // Chave única composta
 }
